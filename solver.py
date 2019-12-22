@@ -26,6 +26,18 @@ class Sudoku:
                         print(self.cells[27 * r + i * 9 + 3 * c + j].position, end = ' ')
                 print()
 
+    def used_in_row(self, row, val):
+        for i in range(self.size):
+            if val == self.cells[row*self.size+i].val:
+                return True
+        return False
+
+    def used_in_col(self, col, val):
+        for i in range(self.size):
+            if val == self.cells[i*9+col].val:
+                return True
+        return False
+
 
 
 
@@ -33,8 +45,7 @@ class Sudoku:
 class Cell:
     def __init__(self, x, y):
         self.position = (x,y)
-        self.val = None
-        self.state = None
+        self.val = 0
 
     def assignValue(self, val):
         self.val = val
