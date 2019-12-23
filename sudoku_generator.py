@@ -1,22 +1,4 @@
-import turtle
 import random
-from time import sleep
-
-
-tt = turtle.Turtle()
-top_left_x = -150
-top_left_y = 150
-tt.speed(0)
-tt.color('#000000')
-tt.hideturtle()
-tt._tracer(0)
-
-def text(msg,x,y,size):
-    FONT = ('Arial', size, 'normal')
-    tt.penup()
-    tt.goto(x,y)
-    tt.pendown()
-    tt.write(msg, align="left", font=FONT)
 
 class Sudoku:
     def __init__(self, size=9):
@@ -25,46 +7,6 @@ class Sudoku:
         for i in range(size):
             for j in range(size):
                 self.cells.append(Cell())
-
-    def draw_grid_tt(self):
-        size = 35
-        for i in range(0,10):
-            if i%3 == 0:
-                tt.pensize(3)
-            else:
-                tt.pensize(1)
-            tt.penup()
-            tt.goto(top_left_x,top_left_y-i*size)
-            tt.pendown()
-            tt.goto(top_left_x+9*size,top_left_y-i*size)
-        for j in range(0,10):
-            if j%3 == 0:
-                tt.pensize(3)
-            else:
-                tt.pensize(1)
-            tt.penup()
-            tt.goto(top_left_x+j*size, top_left_y)
-            tt.pendown()
-            tt.goto(top_left_x + j*size, top_left_y - 9*size)
-        for i in range(0,9):
-            for j in range(0,9):
-                if not self.cells[i*9+j].empty():
-                    text(self.cells[i*9+j].val,top_left_x+j*size+12, top_left_y-i*size-size+2,18)
-
-    def initial_random_generator(self,difficulty):
-        percentage = 0.25
-        if difficulty == 1:
-            percentage = 0.40
-        elif difficulty == 3:
-            percentage = 0.15
-        for i in range(9):
-            for j in range(9):
-                if random.uniform(0,1) < percentage:
-                    value = random.randint(1,9)
-                    if valid_assignment(self,value,i,j):
-                        self.cells[i*9+j].assignValue(value)
-
-
 
 class Cell:
     def __init__(self):
@@ -85,20 +27,6 @@ def print_rows(self):
         print()
         if i%3 == 2 and i < 8:
             print('- - -   - - -   - - -')
-
-def print_cols(self):
-    for i in range(self.size):
-        for j in range(self.size):
-            print(self.cells[i + self.size * j].position, end=' ')
-        print()
-
-def print_blocks(self):
-    for r in range(3):
-        for c in range(3):
-            for i in range(3):
-                for j in range(3):
-                    print(self.cells[27 * r + i * 9 + 3 * c + j].val, end=' ')
-            print()
 
 def used_in_row(self, row, val):
     for i in range(self.size):
@@ -163,10 +91,30 @@ def find_empty(self):
                 return i, j
     return -1, -1
 
-def solve(self):
+def solve_diagonal_blocks(self):
+    for k in range(3):
+        nums = range(1,10)
+        for i in range(3):
+            for j in range(3):
+                aux = []
+                length = nums.len
+                found = False
+                for n in range(1,length) and not found:
+                    index = random.randint(1,nums.len)
+                    if not used_in_block(self, from_i_j_to_block(i+k*i, j+k*j), nums[index]):
+                        self.cells[(i+i*k)*9 + j + k*j].assaign_value(nums[index])
+                        nums.remove(nums[index])
+                        nums = nums+aux
+                        found = True
+                    else:
+                        aux.append(nums[index])
+                        nums.remove(nums[index])
+    return self
+
+def generate_other_blocks(self):
     i, j = find_empty(self)
     if i == -1:
-        print('Solved')
+        print('Generated')
         print_rows(self)
         print()
         return True
@@ -183,16 +131,5 @@ def solve(self):
                 self.cells[i * self.size + j].assignValue(0)
     return False
 
-
-def main():
-    A = Sudoku()
-    A.initial_random_generator(1)
-    A.draw_grid_tt()
-    sleep(1)
-    print()
-    tt.getscreen().update()
-    solve(A)
-    turtle.mainloop()
-
-if __name__ == "__main__":
-    main()
+def generate_random_sudoku(self):
+    new_self = solve_diagonal_blocks(self)
