@@ -91,24 +91,16 @@ def find_empty(self):
                 return i, j
     return -1, -1
 
-def solve_diagonal_blocks(self):
+def generate_diagonal_blocks(self):
     for k in range(3):
-        nums = range(1,10)
+        possible_nums = random.sample(range(1, 10), 9)
         for i in range(3):
             for j in range(3):
-                aux = []
-                length = nums.len
-                found = False
-                for n in range(1,length) and not found:
-                    index = random.randint(1,nums.len)
-                    if not used_in_block(self, from_i_j_to_block(i+k*i, j+k*j), nums[index]):
-                        self.cells[(i+i*k)*9 + j + k*j].assaign_value(nums[index])
-                        nums.remove(nums[index])
-                        nums = nums+aux
-                        found = True
-                    else:
-                        aux.append(nums[index])
-                        nums.remove(nums[index])
+                for n in possible_nums:
+                    if not used_in_block(self, from_i_j_to_block(self,i+(k*3),j+(k*3)), n):
+                        self.cells[(i+(k*3))*9 + j + k*3].assignValue(n)
+                        possible_nums.remove(n)
+                        break
     return self
 
 def generate_other_blocks(self):
@@ -117,19 +109,42 @@ def generate_other_blocks(self):
         print('Generated')
         print_rows(self)
         print()
-        return True
+        return True, self
     else:
-        for n in range(1, 10):
+        possible_nums = random.sample(range(1,10),9)
+        for n in possible_nums:
             if valid_assignment(self, n, i, j):
                 self.cells[i * self.size + j].assignValue(n)
-                tt.clear()
-                self.draw_grid_tt()
-                tt.getscreen().update()
-                if solve(self):
-                    return True
+                b, B = generate_other_blocks(self)
+                if b:
+                    return True, self
                 print("Backtrack")
                 self.cells[i * self.size + j].assignValue(0)
-    return False
+    return False, self
+
+def remove_numbers(self,prob):
+    for i in range(9):
+        for j in range(9):
+            if prob > random.uniform(0,1):
+                self.cells[i*9+j].assignValue(0)
+    return self
 
 def generate_random_sudoku(self):
-    new_self = solve_diagonal_blocks(self)
+    new_self = generate_diagonal_blocks(self)
+    print_rows(new_self)
+    print()
+    b, B = generate_other_blocks(new_self)
+    print_rows(B)
+    print()
+    return B
+
+
+
+
+def main():
+    A = Sudoku()
+    B = generate_random_sudoku(A)
+    print_rows(remove_numbers(B,0.7))
+
+if __name__ == "__main__":
+    main()
