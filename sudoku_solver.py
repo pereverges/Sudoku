@@ -63,6 +63,21 @@ class Sudoku:
                             break
         return self
 
+    def generate_not_diagonals(self):
+        for k in [1,2,3,5,6,7]:
+            possible_nums = random.sample(range(1, 10), 9)
+            for i in range(3):
+                for j in range(3):
+                    for n in possible_nums:
+                        if self.valid_assignment(n, i, j):
+                            self.cells[int(k/3)*3+i + (k%3)+j].assignValue(n)
+                            possible_nums.remove(n)
+                            break
+                        else:
+                            possible_nums.append(n)
+                            possible_nums.remove(n)
+
+    # Deprecated method
     def generate_other_blocks(self):
         i, j = self.find_empty()
         if i == -1:
@@ -89,8 +104,8 @@ class Sudoku:
         return self
 
     def generate_random_sudoku(self):
-        self.generate_other_blocks()
         self.generate_diagonal_blocks()
+        self.generate_not_diagonals()
         return self
 
     # SOLVER #
