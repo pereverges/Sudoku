@@ -1,6 +1,4 @@
 import importlib
-import time
-
 from Sudoku.sudoku_solver import Sudoku
 
 importlib.import_module('sudoku_solver')
