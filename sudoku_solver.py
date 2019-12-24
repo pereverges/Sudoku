@@ -16,7 +16,12 @@ class Sudoku:
 
     # GENERATOR AND SOLUTION DEMONSTRATION
 
-    def generation_and_solution(self,prob,inter=False):
+    def generation_and_solution(self,diff,inter=False):
+        prob = 0.4
+        if diff == 1:
+            prob = 0.55
+        elif diff == 3:
+            prob = 0.35
         self.INTERFACE = inter
         self.generate_random_sudoku()
         print('Solution')
@@ -27,7 +32,7 @@ class Sudoku:
         if self.INTERFACE:
             self.turtle_init()
             self.draw_grid_tt()
-            time.sleep(2)
+            time.sleep(2.5)
         self.solver()
         self.print_rows()
         if self.INTERFACE:
@@ -275,3 +280,4 @@ class Cell:
 
     def setInitial(self):
         self.initial = True
+
