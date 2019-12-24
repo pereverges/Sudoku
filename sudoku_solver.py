@@ -1,7 +1,10 @@
 import turtle
 import random
+import time
 
 class Sudoku:
+
+    INTERFACE=True
 
     def __init__(self, size=9):
         self.size = size
@@ -10,6 +13,24 @@ class Sudoku:
             for j in range(size):
                 self.cells.append(Cell())
 
+    # GENERATOR AND SOLUTION DEMONSTRATION
+
+    def generation_and_solution(self,prob,inter=False):
+        self.INTERFACE = inter
+        self.generate_random_sudoku()
+        print('Solution')
+        self.print_rows()
+        self.remove_numbers(prob)
+        print('Initial Sudoku')
+        self.print_rows()
+        if self.INTERFACE:
+            self.turtle_init()
+            self.draw_grid_tt()
+            time.sleep(2)
+        self.solver()
+        self.print_rows()
+        if self.INTERFACE:
+            turtle.mainloop()
 
     # TURTLE INIT #
 
@@ -17,7 +38,7 @@ class Sudoku:
         self.tt = turtle.Turtle()
         self.top_left_x = -150
         self.top_left_y = 150
-        self.tt.speed(0)
+        self.tt.speed(3)
         self.tt.color('#000000')
         self.tt.hideturtle()
         self.tt._tracer(0)
@@ -39,7 +60,7 @@ class Sudoku:
     def generate_other_blocks(self):
         i, j = self.find_empty()
         if i == -1:
-            print('Generated')
+            #print('Generated')
             return True
         else:
             possible_nums = random.sample(range(1, 10), 9)
@@ -68,10 +89,6 @@ class Sudoku:
 
     # SOLVER #
 
-    def solve(self):
-        self.turtle_init()
-        self.solver()
-
     def solver(self):
         i, j = self.find_empty()
         if i == -1:
@@ -81,9 +98,11 @@ class Sudoku:
             for n in range(1, 10):
                 if self.valid_assignment(n, i, j):
                     self.cells[i * self.size + j].assignValue(n)
-                    self.tt.clear()
-                    self.draw_grid_tt()
-                    self.tt.getscreen().update()
+                    if self.INTERFACE:
+                        size = 35
+                        self.text(self.cells[i * 9 + j].val, self.top_left_x + j * size + 12, self.top_left_y - i * size - size + 2, 18)
+                        self.tt.getscreen().update()
+
                     if self.solver():
                         return True
                     #print("Backtrack")
@@ -184,8 +203,29 @@ class Sudoku:
 
     # DRAWERS #
 
+    def remove_text(self, x, y, size):
+        size = size+5
+        turtle.ht()
+        turtle.setpos(x, y+5)
+        turtle.color(turtle.bgcolor())
+        turtle.begin_fill()
+        turtle.fd(size-5)
+        turtle.setheading(90)
+        turtle.fd(size)
+        turtle.setheading(180)
+        turtle.fd(size)
+        turtle.setheading(270)
+        turtle.fd(size)
+        turtle.setheading(0)
+        turtle.fd(size)
+        turtle.end_fill()
+        turtle.ht()
+
     def text(self, msg, x, y, size):
         FONT = ('Arial', size, 'normal')
+        turtle.penup()
+        self.remove_text(x,y,size)
+
         self.tt.penup()
         self.tt.goto(x, y)
         self.tt.pendown()
@@ -234,18 +274,3 @@ class Cell:
 
     def setInitial(self):
         self.initial = True
-
-
-def main():
-    A = Sudoku()
-    B = A.generate_random_sudoku()
-    print("solution")
-    B.print_rows()
-    B.remove_numbers(0.5)
-    B.solve()
-    B.print_rows()
-    turtle.mainloop()
-
-
-if __name__ == "__main__":
-    main()
