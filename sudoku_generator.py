@@ -107,8 +107,6 @@ def generate_other_blocks(self):
     i, j = find_empty(self)
     if i == -1:
         print('Generated')
-        print_rows(self)
-        print()
         return True, self
     else:
         possible_nums = random.sample(range(1,10),9)
@@ -118,7 +116,6 @@ def generate_other_blocks(self):
                 b, B = generate_other_blocks(self)
                 if b:
                     return True, self
-                print("Backtrack")
                 self.cells[i * self.size + j].assignValue(0)
     return False, self
 
@@ -130,13 +127,8 @@ def remove_numbers(self,prob):
     return self
 
 def generate_random_sudoku(self):
-    new_self = generate_diagonal_blocks(self)
-    print_rows(new_self)
-    print()
-    b, B = generate_other_blocks(new_self)
-    print_rows(B)
-    print()
-    return B
+    _, self = generate_other_blocks(generate_diagonal_blocks(self))
+    return self
 
 
 
