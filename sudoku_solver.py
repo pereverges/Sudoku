@@ -5,6 +5,7 @@ import time
 class Sudoku:
 
     INTERFACE=True
+    CELL_SIZE=35
 
     def __init__(self, size=9):
         self.size = size
@@ -99,10 +100,8 @@ class Sudoku:
                 if self.valid_assignment(n, i, j):
                     self.cells[i * self.size + j].assignValue(n)
                     if self.INTERFACE:
-                        size = 35
-                        self.text(self.cells[i * 9 + j].val, self.top_left_x + j * size + 12, self.top_left_y - i * size - size + 2, 18)
+                        self.text(self.cells[i * 9 + j].val, self.top_left_x + j * self.CELL_SIZE + 12, self.top_left_y - i * self.CELL_SIZE - self.CELL_SIZE + 2, 18)
                         self.tt.getscreen().update()
-
                     if self.solver():
                         return True
                     #print("Backtrack")
@@ -203,7 +202,7 @@ class Sudoku:
 
     # DRAWERS #
 
-    def remove_text(self, x, y, size):
+    def remove_text(self, x, y,size):
         size = size+5
         turtle.ht()
         turtle.setpos(x, y+5)
@@ -239,27 +238,27 @@ class Sudoku:
             else:
                 self.tt.pensize(1)
             self.tt.penup()
-            self.tt.goto(self.top_left_x, self.top_left_y - i * size)
+            self.tt.goto(self.top_left_x, self.top_left_y - i * self.CELL_SIZE)
             self.tt.pendown()
-            self.tt.goto(self.top_left_x + 9 * size, self.top_left_y - i * size)
+            self.tt.goto(self.top_left_x + 9 * self.CELL_SIZE, self.top_left_y - i * self.CELL_SIZE)
         for j in range(0, 10):
             if j % 3 == 0:
                 self.tt.pensize(3)
             else:
                 self.tt.pensize(1)
             self.tt.penup()
-            self.tt.goto(self.top_left_x + j * size, self.top_left_y)
+            self.tt.goto(self.top_left_x + j * self.CELL_SIZE, self.top_left_y)
             self.tt.pendown()
-            self.tt.goto(self.top_left_x + j * size, self.top_left_y - 9 * size)
+            self.tt.goto(self.top_left_x + j * self.CELL_SIZE, self.top_left_y - 9 * self.CELL_SIZE)
         for i in range(0, 9):
             for j in range(0, 9):
                 if not self.cells[i * 9 + j].empty():
                     if self.cells[i*9+j].initial:
                         self.tt.color('#FF0000')
-                        self.text(self.cells[i * 9 + j].val, self.top_left_x + j * size + 12,self.top_left_y - i * size - size + 2, 18)
+                        self.text(self.cells[i * 9 + j].val, self.top_left_x + j * self.CELL_SIZE + 12,self.top_left_y - i * self.CELL_SIZE - self.CELL_SIZE + 2, 18)
                         self.tt.color('#000000')
                     else:
-                        self.text(self.cells[i * 9 + j].val, self.top_left_x + j * size + 12,self.top_left_y - i * size - size + 2, 18)
+                        self.text(self.cells[i * 9 + j].val, self.top_left_x + j * self.CELL_SIZE + 12,self.top_left_y - i * self.CELL_SIZE - self.CELL_SIZE + 2, 18)
 
 class Cell:
     def __init__(self):
@@ -274,3 +273,6 @@ class Cell:
 
     def setInitial(self):
         self.initial = True
+
+
+Sudoku().generation_and_solution(0.35,True)
