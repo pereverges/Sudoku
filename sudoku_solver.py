@@ -23,11 +23,10 @@ class Sudoku:
     LAST_FIND_I = 0
     LAST_FIND_J = 0
 
-    def __init__(self, size=9):
-        self.size = size
+    def __init__(self):
         self.cells = []
-        for i in range(size):
-            for j in range(size):
+        for i in range(9):
+            for j in range(9):
                 self.cells.append(Cell())
 
     # GENERATOR AND SOLUTION DEMONSTRATION
@@ -55,7 +54,10 @@ class Sudoku:
             time.sleep(2.5)
         self.solver()
         self.print_rows()
-
+        if self.sudoku_check():
+            print("Correct")
+        else:
+            print("Error")
         if self.INTERFACE:
             turtle.mainloop()
 
@@ -109,12 +111,12 @@ class Sudoku:
             possible_nums = random.sample(range(1, 10), 9)
             for n in possible_nums:
                 if self.valid_assignment(n, i, j):
-                    self.cells[i * self.size + j].assignValue(n)
+                    self.cells[i*9+j].assignValue(n)
                     if self.generate_other_blocks():
                         return True
                     self.LAST_FIND_I = i
                     self.LAST_FIND_J = j
-                    self.cells[i * self.size + j].assignValue(0)
+                    self.cells[i*9+j].assignValue(0)
         return False
 
     def remove_numbers(self, prob):
@@ -141,16 +143,16 @@ class Sudoku:
         else:
             for n in range(1, 10):
                 if self.valid_assignment(n, i, j):
-                    self.cells[i * self.size + j].assignValue(n)
+                    self.cells[i*9+j].assignValue(n)
                     if self.INTERFACE:
-                        self.text(self.cells[i * 9 + j].val, self.top_left_x + j * self.CELL_SIZE + 12, self.top_left_y - i * self.CELL_SIZE - self.CELL_SIZE + 2, 18)
+                        self.text(self.cells[i*9+j].val, self.top_left_x + j * self.CELL_SIZE + 12, self.top_left_y - i * self.CELL_SIZE - self.CELL_SIZE + 2, 18)
                         self.tt.getscreen().update()
                     if self.solver():
                         return True
                     self.LAST_FIND_I = i
                     self.LAST_FIND_J = j
                     #print("Backtrack")
-                    self.cells[i * self.size + j].assignValue(0)
+                    self.cells[i*9+j].assignValue(0)
         return False
 
     # COMPARATORS #
@@ -159,14 +161,14 @@ class Sudoku:
         return not self.used_in_row(i, val) and not self.used_in_col(j, val) and not self.used_in_block(self.from_i_j_to_block(i, j),val)
 
     def used_in_row(self, row, val):
-        for i in range(self.size):
-            if val == self.cells[row * self.size + i].val:
+        for i in range(9):
+            if val == self.cells[row*9+i].val:
                 return True
         return False
 
     def used_in_col(self, col, val):
-        for i in range(self.size):
-            if val == self.cells[i * 9 + col].val:
+        for i in range(9):
+            if val == self.cells[i*9+col].val:
                 return True
         return False
 
@@ -188,14 +190,14 @@ class Sudoku:
     def find_empty_initial(self):
         for i in range(9):
             for j in range(9):
-                if self.cells[i * self.size + j].empty():
+                if self.cells[i*9+j].empty():
                     return i, j
         return -1, -1
 
     def find_empty(self):
         for i in range(self.LAST_FIND_I,9):
             for j in range(self.LAST_FIND_J,9):
-                if self.cells[i * self.size + j].empty():
+                if self.cells[i*9+j].empty():
                     self.LAST_FIND_I = i
                     self.LAST_FIND_J = j
                     return i, j
@@ -205,7 +207,7 @@ class Sudoku:
     def sudoku_complete(self):
         for i in range(9):
             for j in range(9):
-                if self.cells[i * self.size + j].empty():
+                if self.cells[i*9+j].empty():
                     return False
         return True
 
@@ -229,12 +231,50 @@ class Sudoku:
         elif i < 9 and j < 9:
             return 8
 
+    def sudoku_check(self):
+        for i in range(9):
+            for j in range(9):
+                if not self.check_cell(i,j,self.cells[i*9+j].val):
+                    print(i,j)
+                    return False
+        return True
+
+    def check_cell(self,i,j,val):
+        return self.check_row(val,i,j) and self.check_col(val,j,i) and self.check_block(self.from_i_j_to_block(i,j),val,i*9+j)
+
+    def check_row(self,val,row,j):
+        for i in range(9):
+            if val == self.cells[row*9+i].val and i!=j:
+                return False
+        return True
+
+    def check_col(self,val,col,j):
+        for i in range(9):
+            if val == self.cells[i*9+col].val and i!=j:
+                return False
+        return True
+
+    def check_block(self,block,val,pos):
+        c = block % 3
+        if block < 3:
+            r = 0
+        elif block < 6:
+            r = 1
+        else:
+            r = 2
+        for i in range(3):
+            for j in range(3):
+                if val == self.cells[27*r+i*9+3*c+j].val and pos!=(27*r+i*9+3*c+j):
+                    print(str(27*r+i*9+3*c+j), pos)
+                    return False
+        return True
+
     # PRINTERS #
 
     def print_rows(self):
-        for i in range(self.size):
-            for j in range(self.size):
-                print(self.cells[i * self.size + j].val, end=' ')
+        for i in range(9):
+            for j in range(9):
+                print(self.cells[i*9+j].val, end=' ')
                 if j % 3 == 2 and j < 8:
                     print('|', end=' ')
             print()
@@ -243,9 +283,9 @@ class Sudoku:
         print()
 
     def print_cols(self):
-        for i in range(self.size):
-            for j in range(self.size):
-                print(self.cells[i + self.size * j].position, end=' ')
+        for i in range(9):
+            for j in range(9):
+                print(self.cells[i+9*j].position, end=' ')
             print()
 
     def print_blocks(self):
