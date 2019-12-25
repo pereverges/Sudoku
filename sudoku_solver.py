@@ -6,6 +6,8 @@ class Sudoku:
 
     INTERFACE=True
     CELL_SIZE=35
+    LAST_FIND_I = 0
+    LAST_FIND_J = 0
 
     def __init__(self, size=9):
         self.size = size
@@ -22,6 +24,8 @@ class Sudoku:
             prob = 0.55
         elif diff == 3:
             prob = 0.35
+        elif diff == 4:
+            prob = 0.25
         self.INTERFACE = inter
         self.generate_random_sudoku()
         print('Solution')
@@ -35,6 +39,7 @@ class Sudoku:
             time.sleep(2.5)
         self.solver()
         self.print_rows()
+
         if self.INTERFACE:
             turtle.mainloop()
 
@@ -69,17 +74,18 @@ class Sudoku:
             for i in range(3):
                 for j in range(3):
                     for n in possible_nums:
-                        if self.valid_assignment(n, i, j):
-                            self.cells[int(k/3)*3+i + (k%3)+j].assignValue(n)
+                        print(possible_nums)
+                        if self.valid_assignment(n, (int(k/3)*3)+i, ((k%3)*3)+j):
+                            self.cells[((int(k/3)*3)+i)*9+(((k%3)*3)+j)].assignValue(n)
+                            print((int(k/3)*3)+i, ((k%3)*3)+j)
                             possible_nums.remove(n)
-                            break
                         else:
+                            print('nope ' + str(n))
                             possible_nums.append(n)
                             possible_nums.remove(n)
 
-    # Deprecated method
     def generate_other_blocks(self):
-        i, j = self.find_empty()
+        i, j = self.find_empty_initial()
         if i == -1:
             #print('Generated')
             return True
@@ -105,7 +111,7 @@ class Sudoku:
 
     def generate_random_sudoku(self):
         self.generate_diagonal_blocks()
-        self.generate_not_diagonals()
+        self.generate_other_blocks()
         return self
 
     # SOLVER #
@@ -120,12 +126,13 @@ class Sudoku:
                 if self.valid_assignment(n, i, j):
                     self.cells[i * self.size + j].assignValue(n)
                     if self.INTERFACE:
-                        size = 35
-                        self.text(self.cells[i * 9 + j].val, self.top_left_x + j * size + 12, self.top_left_y - i * size - size + 2, 18)
+                        self.text(self.cells[i * 9 + j].val, self.top_left_x + j * self.CELL_SIZE + 12, self.top_left_y - i * self.CELL_SIZE - self.CELL_SIZE + 2, 18)
                         self.tt.getscreen().update()
 
                     if self.solver():
                         return True
+                    self.LAST_FIND_I = i
+                    self.LAST_FIND_J = j
                     #print("Backtrack")
                     self.cells[i * self.size + j].assignValue(0)
         return False
@@ -161,11 +168,21 @@ class Sudoku:
                     return True
         return False
 
-    def find_empty(self):
+    def find_empty_initial(self):
         for i in range(9):
             for j in range(9):
                 if self.cells[i * self.size + j].empty():
                     return i, j
+        return -1, -1
+
+    def find_empty(self):
+        for i in range(self.LAST_FIND_I,9):
+            for j in range(self.LAST_FIND_J,9):
+                if self.cells[i * self.size + j].empty():
+                    self.LAST_FIND_I = i
+                    self.LAST_FIND_J = j
+                    return i, j
+            self.LAST_FIND_J = 0
         return -1, -1
 
     def sudoku_complete(self):
@@ -253,34 +270,33 @@ class Sudoku:
         self.tt.write(msg, align="left", font=FONT)
 
     def draw_grid_tt(self):
-        size = 35
         for i in range(0, 10):
             if i % 3 == 0:
                 self.tt.pensize(3)
             else:
                 self.tt.pensize(1)
             self.tt.penup()
-            self.tt.goto(self.top_left_x, self.top_left_y - i * size)
+            self.tt.goto(self.top_left_x, self.top_left_y - i * self.CELL_SIZE)
             self.tt.pendown()
-            self.tt.goto(self.top_left_x + 9 * size, self.top_left_y - i * size)
+            self.tt.goto(self.top_left_x + 9 * self.CELL_SIZE, self.top_left_y - i * self.CELL_SIZE)
         for j in range(0, 10):
             if j % 3 == 0:
                 self.tt.pensize(3)
             else:
                 self.tt.pensize(1)
             self.tt.penup()
-            self.tt.goto(self.top_left_x + j * size, self.top_left_y)
+            self.tt.goto(self.top_left_x + j * self.CELL_SIZE, self.top_left_y)
             self.tt.pendown()
-            self.tt.goto(self.top_left_x + j * size, self.top_left_y - 9 * size)
+            self.tt.goto(self.top_left_x + j * self.CELL_SIZE, self.top_left_y - 9 * self.CELL_SIZE)
         for i in range(0, 9):
             for j in range(0, 9):
                 if not self.cells[i * 9 + j].empty():
                     if self.cells[i*9+j].initial:
                         self.tt.color('#FF0000')
-                        self.text(self.cells[i * 9 + j].val, self.top_left_x + j * size + 12,self.top_left_y - i * size - size + 2, 18)
+                        self.text(self.cells[i * 9 + j].val, self.top_left_x + j * self.CELL_SIZE + 12,self.top_left_y - i * self.CELL_SIZE - self.CELL_SIZE + 2, 18)
                         self.tt.color('#000000')
                     else:
-                        self.text(self.cells[i * 9 + j].val, self.top_left_x + j * size + 12,self.top_left_y - i * size - size + 2, 18)
+                        self.text(self.cells[i * 9 + j].val, self.top_left_x + j * self.CELL_SIZE + 12,self.top_left_y - i * self.CELL_SIZE - self.CELL_SIZE + 2, 18)
 
 class Cell:
     def __init__(self):
