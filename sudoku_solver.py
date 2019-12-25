@@ -2,6 +2,20 @@ import turtle
 import random
 import time
 
+class Cell:
+    def __init__(self):
+        self.val = 0
+        self.initial = False
+
+    def assignValue(self, val):
+        self.val = val
+
+    def empty(self):
+        return self.val == 0
+
+    def setInitial(self):
+        self.initial = True
+
 class Sudoku:
 
     INTERFACE=True
@@ -28,6 +42,8 @@ class Sudoku:
             prob = 0.25
         self.INTERFACE = inter
         self.generate_random_sudoku()
+        self.LAST_FIND_I = 0
+        self.LAST_FIND_J = 0
         print('Solution')
         self.print_rows()
         self.remove_numbers(prob)
@@ -68,6 +84,7 @@ class Sudoku:
                             break
         return self
 
+    # Not working (should do backtrack instead)
     def generate_not_diagonals(self):
         for k in [1,2,3,5,6,7]:
             possible_nums = random.sample(range(1, 10), 9)
@@ -85,18 +102,18 @@ class Sudoku:
                             possible_nums.remove(n)
 
     def generate_other_blocks(self):
-        i, j = self.find_empty_initial()
+        i, j = self.find_empty()
         if i == -1:
-            #print('Generated')
             return True
         else:
             possible_nums = random.sample(range(1, 10), 9)
             for n in possible_nums:
                 if self.valid_assignment(n, i, j):
                     self.cells[i * self.size + j].assignValue(n)
-
                     if self.generate_other_blocks():
                         return True
+                    self.LAST_FIND_I = i
+                    self.LAST_FIND_J = j
                     self.cells[i * self.size + j].assignValue(0)
         return False
 
@@ -128,7 +145,6 @@ class Sudoku:
                     if self.INTERFACE:
                         self.text(self.cells[i * 9 + j].val, self.top_left_x + j * self.CELL_SIZE + 12, self.top_left_y - i * self.CELL_SIZE - self.CELL_SIZE + 2, 18)
                         self.tt.getscreen().update()
-
                     if self.solver():
                         return True
                     self.LAST_FIND_I = i
@@ -168,6 +184,7 @@ class Sudoku:
                     return True
         return False
 
+    #Depracated
     def find_empty_initial(self):
         for i in range(9):
             for j in range(9):
@@ -297,18 +314,4 @@ class Sudoku:
                         self.tt.color('#000000')
                     else:
                         self.text(self.cells[i * 9 + j].val, self.top_left_x + j * self.CELL_SIZE + 12,self.top_left_y - i * self.CELL_SIZE - self.CELL_SIZE + 2, 18)
-
-class Cell:
-    def __init__(self):
-        self.val = 0
-        self.initial = False
-
-    def assignValue(self, val):
-        self.val = val
-
-    def empty(self):
-        return self.val == 0
-
-    def setInitial(self):
-        self.initial = True
 
