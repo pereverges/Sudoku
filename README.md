@@ -19,6 +19,9 @@ In order to generate a sudoku problem, you can not place random numbers in the g
 
 This is the way I designed my generator. To do it a bit more efficent first I assign values to the diagonal blocks and then I fill the rest.
 
+![Sudoku Unsolved]()
+
+
 #### Solver
 
 Basically to create a generator first you have to create the solver. My solver uses a basic backtrack algorithm that looks for all the possible solutions and when it found one stops and outputs the solution.
